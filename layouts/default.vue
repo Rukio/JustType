@@ -7,8 +7,17 @@
 <style lang="scss">
 
 @font-face {
-  font-family: Manaspc;
-  src: url('~assets/fonts/Manaspc.ttf');
+  font-family: Cabin;
+  src: url('~assets/fonts/Cabin-Regular.ttf');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: DancingScript;
+  src: url('~assets/fonts/DancingScript-Regular.ttf');
+  font-weight: 400;
+  font-style: normal;
 }
 
 body {
@@ -20,7 +29,7 @@ body {
 }
 
 body, input, a {
-  font-family: Manaspc, sans-serif;
+  font-family: Cabin, sans-serif;
 }
 
 * {

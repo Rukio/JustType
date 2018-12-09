@@ -18,13 +18,27 @@
         </transition>
       </div>
       <div class="middle">
-        <div class="text-wrap">
-          <span v-if="textTyped.length"
-            v-for="(word, index) in textTyped"
-            :key="index"
-            :class="{ 'finished' : typeFinished }"
-            class="typed">{{ word }}</span>
-          <span class="typing" :class="{ 'error' : typingError, 'active' : counterActive }">{{ textTyping }}</span><span v-if="targetWord.length" class="target-word">{{ targetWord }}</span><span class="rest">{{ textRest }}</span>
+        <div class="text-container">
+          <div class="text-wrap">
+            <span v-if="textTyped.length"
+              v-for="(word, index) in textTyped"
+              :key="index"
+              :class="{ 'finished' : typeFinished }"
+              class="typed">{{ word }}</span>
+            <span class="typing"
+              :class="{
+                'error' : typingError,
+                'active' : counterActive }">{{ textTyping }}</span><!--
+        --><span v-if="targetWord.length"
+              class="target-word">{{ targetWord }}</span><!--
+        --><transition name="quoteAppearance"><!--
+          --><span class="rest" v-if="textRest.length">{{ textRest }}</span><!--
+        --></transition>
+          </div>
+          <div class="text-desc">
+            <p class="relation">{{ quoteCurrent.relation }}</p>
+            <p class="source">{{ quoteCurrent.source }}</p>
+          </div>
         </div>
         <nav class="action-menu">
           <action-menu @start="startRace" @reset="initText"/>
@@ -54,7 +68,7 @@ export default {
   data() {
     return {
       fieldTyping: '',
-      text: '', // current text to type
+      quoteCurrent: {},
       textTyped: [],
       textTyping: '',
       textRest: '',
@@ -83,28 +97,28 @@ export default {
     }
   },
   created() {
-    new Promise((resolve, reject) => {
-      this.$store.dispatch('refreshQuotes')
-      resolve('result')
+    this.$store.dispatch('refreshQuotes')
+    .then(() => {
+      console.log(this.$store.state.quoteList)
+      this.pickRandomQuote()
     })
-    .then(
-      result => {
-        this.pickRandomQuote()
-      },
-      error => {
-
-      })
   },
   mounted() {
     
   },
   methods: {
     pickRandomQuote() {
-      let quoteIndex = Math.floor(Math.random() * this.$store.state.quoteList.length);
-      this.text = this.$store.state.quoteList[quoteIndex].quote
-      this.textRest = this.text;
+      let quoteIndex = this.getRandomInt(1, this.$store.state.quoteList.length);
+      console.log(this.$store.state.quoteList.length + ' length')
+      console.log('Index ' + quoteIndex)
+      this.$store.commit('setQuoteCurrent', this.$store.state.quoteList[quoteIndex])
+      this.quoteCurrent = this.$store.state.quoteCurrent
+      this.textRest = this.quoteCurrent.quote;
       this.loadText();
       console.log(quoteIndex)
+    },
+    getRandomInt(min, max) {
+      return Math.floor(Math.random() * (max - min)) + min;
     },
     startCountdown() {
       this.countdown = 4;
@@ -178,7 +192,7 @@ export default {
         if (this.targetWord == '' && this.textRest == '') {
           this.finishTyping();
         }
-      }, 10)
+      }, 5)
     },
     onDeleteChar(event) {
       if (this.targetWordConst.startsWith(this.fieldTyping)) {
@@ -256,7 +270,7 @@ export default {
       this.textTyped = []
       this.speedResultCPM = 0
       this.speedResultWPM = 0
-      this.textRest = this.text
+      this.textRest = this.quoteCurrent.quote
       this.firstWordTrigger = true
       this.currWordN = 0
       this.typeFinished = false
@@ -398,6 +412,21 @@ export default {
     opacity: 0;
     animation: caret-simple 1s infinite;
   }
+}
+
+.rest {
+  opacity: 1;
+}
+
+.quoteAppearance-enter-active {
+    transition: opacity 1s;
+}
+
+.quoteAppearance-leave-active {
+    transition: opacity .5s;
+}
+.quoteAppearance-enter, .quoteAppearance-leave-to {
+    opacity: 0;
 }
 
 .cd-numbers-enter-active {

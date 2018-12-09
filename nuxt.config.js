@@ -38,6 +38,10 @@ module.exports = {
         })
       }
     }
-  }
+  },
+  plugins: [
+    { src: '~/plugins/firebase.js', src: false }
+  ],
+  vendor: ['firebase']
 }
 

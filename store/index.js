@@ -8,7 +8,7 @@ const store = () => new Vuex.Store({
 
   state: {
     quoteList: [],
-    quoteCurrent: ''
+    quoteCurrent: {}
   },
   mutations: {
     setQuoteList(state, data) {
@@ -19,21 +19,26 @@ const store = () => new Vuex.Store({
     }
   },
   actions: {
-    refreshQuotes() {
-      db.collection('quotes').get().then(
-        (querySnapshot) => {
-          commit('setQuoteList', null)
-          querySnapshot.forEach(doc => {
-            let data = {
-              'id': doc.id,
-              'quote': doc.data().quote,
-              'relation': doc.data().relation,
-              'source': doc.data().source
-            }
-            commit('setQuoteList', data)
-          });
-        }
-      )
+    refreshQuotes({commit}) {
+      return new Promise((resolve, reject) => {
+        db.collection('quotes').get().then(
+          (querySnapshot) => {
+            console.log('ok')
+            commit('setQuoteList', [])
+            querySnapshot.forEach(doc => {
+              let data = {
+                'id': doc.id,
+                'quote': doc.data().quote,
+                'relation': doc.data().relation,
+                'source': doc.data().source
+              }
+              console.log(data)
+              commit('setQuoteList', data)
+              resolve()
+            });
+          }
+        )
+      })
     }
   }
 })
