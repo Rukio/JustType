@@ -39,9 +39,13 @@ module.exports = {
       }
     }
   },
-  plugins: [
-    { src: '~/plugins/firebase.js', src: false }
+  modules: [
+    '@nuxtjs/router'
   ],
-  vendor: ['firebase']
+  generate: { // required when generating with @nuxtjs/router plugin
+    routes: [
+      '/'
+    ]
+  }
 }
 

@@ -28,7 +28,7 @@ body {
   min-height: 100vh;
 }
 
-body, input, a {
+body, input, button, a {
   font-family: Cabin, sans-serif;
 }
 
@@ -36,6 +36,38 @@ body, input, a {
   padding: 0;
   margin: 0;
   box-sizing: border-box;
+}
+
+input {
+  width: 100%;
+  height: 100%;
+  font-size: 25px;
+  padding: 10px 10px 10px 20px;
+  border-radius: 100vh;
+  background: linear-gradient(to bottom, #97c5da 0%,#4883c3 100%);
+  border: none;
+  outline: none;
+
+  &::placeholder {
+    color: #fff;
+  }
+}
+
+button {
+  border: 2px solid #4883c3;
+  background-color: transparent;
+  border-radius: 5px;
+  font-size: 15px;
+  cursor: pointer;
+  color: #fff;
+  min-height: 40px;
+  padding: 0 20px;
+  background-color: transparent;
+  transition: .3s;
+
+  &:hover {
+    background-color: #4883c3;
+  }
 }
 
 </style>

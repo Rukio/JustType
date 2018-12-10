@@ -31,31 +31,35 @@
                 'active' : counterActive }">{{ textTyping }}</span><!--
         --><span v-if="targetWord.length"
               class="target-word">{{ targetWord }}</span><!--
-        --><transition name="quoteAppearance"><!--
+        --><transition name="quoteAppearance" @enter="descShow = true"><!--
           --><span class="rest" v-if="textRest.length">{{ textRest }}</span><!--
         --></transition>
           </div>
-          <div class="text-desc">
-            <p class="relation">{{ quoteCurrent.relation }}</p>
-            <p class="source">{{ quoteCurrent.source }}</p>
-          </div>
+          <transition name="quoteAppearance" @enter="fieldShow = true">
+            <div class="text-desc" v-if="descShow">
+              <p class="relation">{{ quoteCurrent.relation }}</p>
+              <p class="source">{{ quoteCurrent.source }}</p>
+            </div>
+          </transition>
         </div>
         <nav class="action-menu">
           <action-menu @start="startRace" @reset="initText"/>
         </nav>
       </div>
     </div>
-    <div class="type-field">
-      <input v-model="fieldTyping"
-        ref="typeField"
-        @cut="prevent($event)"
-        @copy="prevent($event)"
-        @paste="prevent($event)"
-        @keydown="onType($event)"
-        :class="{ 'error-field' : typingError }"
-        :disabled="!counterActive"
-        type="text" :placeholder="typePlaceholder" autocomplete="off" autofocus>
-    </div>
+    <transition name="quoteAppearance">
+      <div class="type-field" v-if="fieldShow">
+        <input v-model="fieldTyping"
+          ref="typeField"
+          @cut="prevent($event)"
+          @copy="prevent($event)"
+          @paste="prevent($event)"
+          @keydown="onType($event)"
+          :class="{ 'error-field' : typingError }"
+          :disabled="!counterActive"
+          type="text" :placeholder="typePlaceholder" autocomplete="off" autofocus>
+      </div>
+    </transition>
   </section>
 </template>
 
@@ -83,6 +87,8 @@ export default {
       typeFinished: false,
       countdown: 0,
       countdownInterval: null,
+      descShow: false,
+      fieldShow: false,
 
       iLastTime: 0, // Type speed variables
       iTime: 0,
@@ -313,6 +319,7 @@ export default {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-start;
+  justify-content: center;
 }
 
 .middle {
@@ -320,6 +327,7 @@ export default {
   flex-wrap: wrap;
   margin-top: 30px;
   width: 100%;
+  justify-content: center;
 }
 
 .action-menu {
@@ -334,7 +342,7 @@ export default {
 
 .speed {
   font-size: 50px;
-  width: 50%;
+  width: 300px;
 
   .current .label {
     color: #bbf;
@@ -354,9 +362,13 @@ export default {
 }
 
 .countdown {
+  position: absolute;
+  right: 40%;
+  top: 0;
+
   span {
     backface-visibility: hidden;
-    transform-origin: 50% 10%
+    transform-origin: 50% 10%;
   }
   .number {
     display: block;
@@ -371,15 +383,31 @@ export default {
 }
 
 .text {
+  position: relative;
   font-size: 25px;
   width: 100%;
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
 
   &-wrap {
     width: 700px;
     line-height: 35px;
   }
+}
+
+.text-container {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+}
+
+.text-desc {
+  font-family: DancingScript, sans-serif;
+  font-size: 12px;
+  align-self: flex-end;
+  font-size: 22px;
+  margin-top: 20px;
 }
 
 .type-field {
@@ -527,22 +555,6 @@ export default {
 .type-field {
   margin-top: 39px;
   height: 40px;
-  
-
-  input {
-    width: 100%;
-    height: 100%;
-    font-size: 25px;
-    padding: 10px 10px 10px 20px;
-    border-radius: 100vh;
-    background: linear-gradient(to bottom, #97c5da 0%,#4883c3 100%);
-    border: none;
-    outline: none;
-
-    &::placeholder {
-      color: #fff;
-    }
-  }
 }
 
 </style>

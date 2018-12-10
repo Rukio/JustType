@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import db from '~/plugins/firebase.js'
+import firebase from '~/plugins/firebase.js'
+import admin from '~/store/admin.js'
 
 Vue.use(Vuex)
 
@@ -21,7 +22,7 @@ const store = () => new Vuex.Store({
   actions: {
     refreshQuotes({commit}) {
       return new Promise((resolve, reject) => {
-        db.collection('quotes').get().then(
+        firebase.firestore().collection('quotes').get().then(
           (querySnapshot) => {
             console.log('ok')
             commit('setQuoteList', [])
@@ -40,6 +41,9 @@ const store = () => new Vuex.Store({
         )
       })
     }
+  },
+  modules: {
+    admin
   }
 })
 

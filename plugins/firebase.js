@@ -1,5 +1,6 @@
 import firebase from 'firebase/app'
-import 'firebase/firestore' // <- add
+import 'firebase/firestore'
+import 'firebase/auth'
 import Vue from 'vue';
 
 if (!firebase.apps.length) {
@@ -18,5 +19,6 @@ if (!firebase.apps.length) {
 const db = firebase.firestore()
 const settings = {timestampsInSnapshots: true};
 db.settings(settings);
+Vue.use(firebase)
 
-export default db
+export default firebase
