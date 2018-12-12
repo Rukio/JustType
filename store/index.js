@@ -13,19 +13,19 @@ const store = () => new Vuex.Store({
   },
   mutations: {
     setQuoteList(state, data) {
-      state.quoteList.push(data)
+      state.quoteList = data
     },
     setQuoteCurrent(state, quote) {
       state.quoteCurrent = quote
     }
   },
   actions: {
-    refreshQuotes({commit}) {
+    refreshQuotes({ commit }) {
       return new Promise((resolve, reject) => {
         firebase.firestore().collection('quotes').get().then(
           (querySnapshot) => {
-            console.log('ok')
             commit('setQuoteList', [])
+            let newQuoteList = [];
             querySnapshot.forEach(doc => {
               let data = {
                 'id': doc.id,
@@ -33,13 +33,23 @@ const store = () => new Vuex.Store({
                 'relation': doc.data().relation,
                 'source': doc.data().source
               }
-              console.log(data)
-              commit('setQuoteList', data)
-              resolve()
+              newQuoteList.push(data)
             });
+            commit('setQuoteList', newQuoteList)
+            // console.log(newQuoteList)
+            // console.log(state.quoteList)
+            resolve()
           }
         )
       })
+    }
+  },
+  getters: {
+    getQuoteList(state) {
+      return state.quoteList
+    },
+    getQuoteCurrent(state) {
+      return state.quoteCurrent
     }
   },
   modules: {

@@ -25,6 +25,8 @@ body {
   font-size: 14px;
   background-image: url('~assets/img/bg.png');
   background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
   min-height: 100vh;
 }
 
@@ -38,7 +40,7 @@ body, input, button, a {
   box-sizing: border-box;
 }
 
-input {
+input, textarea {
   width: 100%;
   height: 100%;
   font-size: 25px;
@@ -51,6 +53,12 @@ input {
   &::placeholder {
     color: #fff;
   }
+}
+
+textarea {
+  height: 200px;
+  border-radius: 5px;
+  resize: none;
 }
 
 button {
