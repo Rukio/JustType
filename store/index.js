@@ -20,28 +20,23 @@ const store = () => new Vuex.Store({
     }
   },
   actions: {
-    refreshQuotes({ commit }) {
-      return new Promise((resolve, reject) => {
-        firebase.firestore().collection('quotes').get().then(
-          (querySnapshot) => {
-            commit('setQuoteList', [])
-            let newQuoteList = [];
-            querySnapshot.forEach(doc => {
-              let data = {
-                'id': doc.id,
-                'quote': doc.data().quote,
-                'relation': doc.data().relation,
-                'source': doc.data().source
-              }
-              newQuoteList.push(data)
-            });
-            commit('setQuoteList', newQuoteList)
-            // console.log(newQuoteList)
-            // console.log(state.quoteList)
-            resolve()
-          }
-        )
-      })
+    async refreshQuotes({ commit }) {
+      await firebase.firestore().collection('quotes').get().then(
+        (querySnapshot) => {
+          commit('setQuoteList', [])
+          let newQuoteList = [];
+          querySnapshot.forEach(doc => {
+            let data = {
+              'id': doc.id,
+              'quote': doc.data().quote,
+              'relation': doc.data().relation,
+              'source': doc.data().source
+            }
+            newQuoteList.push(data)
+          });
+          commit('setQuoteList', newQuoteList)
+        }
+      )
     }
   },
   getters: {

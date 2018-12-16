@@ -3,17 +3,20 @@
         <form class="modal-quote">
             <div class="fields">
                 <div class="source">
-                    <input v-model="quoteTemp.source" type="text">
+                    <input v-model="quoteTemp.source"
+                        placeholder="Source" type="text">
                 </div>
                 <div class="relation">
-                    <input v-model="quoteTemp.relation" type="text">
+                    <input v-model="quoteTemp.relation"
+                        placeholder="Relation" type="text">
                 </div>
                 <div class="quote">
-                    <textarea v-model="quoteTemp.quote" type="text"/>
+                    <textarea v-model="quoteTemp.quote"
+                        placeholder="Quote" type="text"/>
                 </div>
             </div>
             <div class="buttons">
-                <button @click.prevent="accept" class="accept">Accept</button>
+                <button @click.prevent="accept(acceptType)" class="accept">Accept</button>
                 <button @click.prevent="cancel" class="cancel">Cancel</button>
             </div>
         </form>
@@ -34,16 +37,28 @@ export default {
         quote: {
             type: Object,
             required: true
+        },
+        acceptType: {
+            type: String,
+            required: true
         }
     },
     methods: {
-        accept() {
-            this.$store.dispatch('editQuote', {
-                id: this.quoteTemp.id,
-                source: this.quoteTemp.source,
-                relation: this.quoteTemp.relation,
-                quote: this.quoteTemp.quote
-            })
+        accept(acceptType) {
+            if (acceptType == 'edit') {
+                this.$store.dispatch('admin/editQuote', {
+                    id: this.quoteTemp.id,
+                    source: this.quoteTemp.source,
+                    relation: this.quoteTemp.relation,
+                    quote: this.quoteTemp.quote
+                })
+            } else if (acceptType == 'create') {
+                this.$store.dispatch('admin/addQuote', {
+                    source: this.quoteTemp.source,
+                    relation: this.quoteTemp.relation,
+                    quote: this.quoteTemp.quote
+                })
+            }
             this.$emit('close')
         },
         cancel() {

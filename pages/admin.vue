@@ -1,6 +1,6 @@
 <template>
     <section class="admin">
-        <form v-if="!isAuthed" @submit.prevent="logIn" class="login-form">
+        <form v-if="!authed && authChecked" @submit.prevent="logIn" class="login-form">
             <div class="email">
                 <input v-model="email"
                     type="text" placeholder="Email">
@@ -13,7 +13,7 @@
                 <button>Log in</button>
             </div>
         </form>
-        <section v-else class="quote-editor">
+        <section v-if="authed && authChecked" class="quote-editor">
             <div class="top-controls">
                 <div class="add-quote">
                     <button @click="quoteAdd">Add quote</button>
@@ -40,15 +40,18 @@
                 </div>
             </div>
         </section>
-        <modal-quote v-if="isEditing" :quote="quoteList[editingQuoteN]"
+        <modal-quote v-if="isEditing"
+        :quote="currentQuote"
+        :acceptType="editType"
         @close="isEditing = false"/>
     </section>
 </template>
 
 <script>
 import firebase from '~/plugins/firebase.js'
-import { mapState, mapMutations, mapGetters } from 'vuex'
 import ModalQuote from '~/components/ModalQuote.vue'
+import { createNamespacedHelpers } from 'vuex'
+const { mapState, mapActions, mapMutations, mapGetters } = createNamespacedHelpers('admin')
 
 export default {
     data() {
@@ -57,56 +60,69 @@ export default {
             password: '',
             quoteList: [],
             editingQuoteN: -1,
-            isEditing: false
+            currentQuote: {},
+            isEditing: false,
+            editType: ''
         }
     },
     methods: {
         logIn() {
-            this.$store.dispatch('logIn', { email: this.email, password: this.password })
+            this.$store.dispatch('admin/logIn', { email: this.email, password: this.password })
         },
         logOut() {
-            this.$store.dispatch('logOut')
+            this.$store.dispatch('admin/logOut')
         },
         quoteEdit(quoteN) {
+            this.editType = 'edit'
             this.isEditing = true
             this.editingQuoteN = quoteN
+            this.currentQuote = this.quoteList[this.editingQuoteN]
         },
         quoteDelete(quoteN) {
-            this.$store.dispatch('deleteQuote', {
+            this.$store.dispatch('admin/deleteQuote', {
                 id: this.quoteList[quoteN].id
             })
         },
         quoteAdd() {
-
+            this.editType = 'create'
+            this.isEditing = true
+            this.currentQuote = {}
         },
-        async checkAuthHere() {
-           await this.$store.dispatch('checkAuth')
+        checkAuthHere() {
+            this.$store.dispatch('admin/checkAuth')
                 .then(() => {
-                    console.log('auth ok')
+                    this.$store.dispatch('refreshQuotes', null, { root: true })
+                        .then(() => {
+                            this.quoteList = this.$store.getters.getQuoteList
+                        })
+                        .catch(() => {
+                            console.log('refresh error')
+                        })
                 })
-                .catch((error) => {
-                    console.log('auth error')
+                .catch(() => {
+                    console.log('cannot check auth')
                 })
-            if (this.$store.getters.getAuthed) {
-                await this.$store.dispatch('refreshQuotes')
-                    .then(() => { console.log('refresh ok')})
-                    .catch(() => { console.log('refresh error')})
-                this.quoteList = this.$store.getters.getQuoteList    
-            }
         }
     },
-    created() {
+    mounted() {
         this.checkAuthHere()
     },
     computed: {
         isAuthed() { return this.$store.getters.getAuthed },
         ...mapState([
-            'admin/authed',
-            'admin/uid'
+            'authed',
+            'uid',
+            'authChecked'
+        ]),
+        ...mapMutations([
+            'setAuthChecked'
         ]),
         ...mapGetters([
-            'admin/getAuthed',
-            'admin/getUID'
+            'getAuthed',
+            'getUID'
+        ]),
+        ...mapActions([
+            'checkAuth'
         ])
     },
     components: {
