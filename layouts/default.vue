@@ -78,5 +78,18 @@ button {
   }
 }
 
+// Transitions
+
+.popup-enter-active {
+  transition: all .2s;
+}
+
+.popup-leave-active {
+  transition: all .2s;
+}
+.popup-enter, .popup-leave-to {
+  transform: scaleY(0);
+}
+
 </style>
 

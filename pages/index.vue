@@ -1,5 +1,13 @@
 <template>
   <section class="main">
+    <div class="header">
+      <div class="auth">
+        <button @click.stop="authPopupToggle('login')"
+          class="log-in">Log in</button>
+        <button class="sign-in">Sign in</button>
+        <login @hide="authPopup('login', false)" v-show="loginPopupShow"/>
+      </div>
+    </div>
     <div class="text">
       <div class="speed">
         <span class="current" v-if="!speedResultCPM"><span class="label">CPM: </span><span class="value" :style="{ color: valueColor }">{{ speedCPM }}</span></span>
@@ -65,6 +73,7 @@
 
 <script>
 import ActionMenu from '~/components/ActionMenu.vue'
+import Login from '~/components/Login.vue'
 import db from '~/plugins/firebase.js'
 import { mapState, mapMutations } from 'vuex'
 
@@ -89,6 +98,7 @@ export default {
       countdownInterval: null,
       descShow: false,
       fieldShow: false,
+      loginPopupShow: false,
 
       iLastTime: 0, // Type speed variables
       iTime: 0,
@@ -110,7 +120,7 @@ export default {
     })
   },
   mounted() {
-    
+    this.popupItem = this.$el
   },
   methods: {
     pickRandomQuote() {
@@ -287,6 +297,20 @@ export default {
       this.refreshInterval = null
       this.loadText()
       this.destroyCounter()
+    },
+    authPopup(type, flag) {
+      if (type == 'login') {
+        this.loginPopupShow = flag
+      } else if (type == 'signin') {
+
+      }
+    },
+    authPopupToggle(type) {
+      if (type == 'login') {
+        this.loginPopupShow ?
+          this.loginPopupShow = false :
+          this.loginPopupShow = true
+      }
     }
   },
   computed: {
@@ -307,7 +331,8 @@ export default {
     ])
   },
   components: {
-    ActionMenu
+    ActionMenu,
+    Login
   }
 }
 </script>
@@ -315,7 +340,7 @@ export default {
 <style lang="scss" scoped>
 
 .main {
-  padding: 10vh 20px 20px;
+  padding: 20px;
   display: flex;
   flex-wrap: wrap;
   align-items: flex-start;
@@ -337,6 +362,21 @@ export default {
   @media screen and (max-width: 920px) {
     width: 100%;
     margin-top: 30px;
+  }
+}
+
+.header {
+  width: 100%;
+}
+
+.auth {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  position: relative;
+
+  button:not(:first-child) {
+    margin-left: 10px;
   }
 }
 

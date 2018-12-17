@@ -162,7 +162,7 @@ export default {
 }
 
 .quote-editor {
-    margin-top: 50px;
+    margin-top: 20px;
 }
 
 .quote:not(:last-child) {
