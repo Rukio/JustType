@@ -1,17 +1,25 @@
 <template>
 <transition name="popup">
     <div v-on-click-outside="hide" class="login-wrap">
-        <form @submit.prevent="login" class="login-form">
+        <form @submit.prevent="register" class="register-form">
             <div class="email">
                 <input v-model="email"
                     type="text" placeholder="E-mail">
+            </div>
+            <div class="name-showed">
+                <input v-model="nameDisplayed"
+                    type="text" placeholder="Name displayed">
             </div>
             <div class="password">
                 <input v-model="password"
                     type="password" placeholder="Password">
             </div>
+            <div class="password-repeat">
+                <input v-model="passwordRepeat"
+                    type="password" placeholder="Repeat password">
+            </div>
             <div class="submit">
-                <button class="log-in">Log in</button>
+                <button class="log-in">Register</button>
             </div>
         </form>
     </div>
@@ -21,39 +29,42 @@
 <script>
 import { mixin as onClickOutside } from 'vue-on-click-outside'
 import { createNamespacedHelpers } from 'vuex'
-
-const { mapActions } = createNamespacedHelpers('auth')
+const { mapState, mapActions, mapMutations, mapGetters } = createNamespacedHelpers('auth')
 
 export default {
     mixins: [onClickOutside],
-
     data() {
         return {
             email: '',
-            password: ''
+            nameDisplayed: '',
+            password: '',
+            passwordRepeat: ''
         }
     },
-
     methods: {
-        login() {
-            this.loginUser({
+        register() {
+            this.registerUser({
                 email: this.email,
-                password: this.password
+                password: this.password,
+                nameDisplayed: this.nameDisplayed
             })
             .then(response => {
                 console.log(response)
             },
             error => {
-                console.log(error)
+                console.log('Registration error ' + error)
             })
         },
         hide() {
             this.$emit('hide')
         },
         ...mapActions([
-            'loginUser'
-        ])
-    }
+            'registerUser',
+        ]),
+    },
+    computed: {
+        
+    },
 }
 </script>
 
@@ -67,13 +78,16 @@ export default {
         transform-origin: 50% 0;
     }
 
-    .login-form {
+    .register-form {
         border: 2px solid #4883c3;
         border-radius: 5px;
         padding: 10px;
     }
 
-    .email, .password {
+    .email,
+    .name-showed,
+    .password,
+    .password-repeat {
         height: 20px;
 
         &:not(:first-child) {

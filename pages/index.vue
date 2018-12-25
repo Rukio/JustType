@@ -1,11 +1,25 @@
 <template>
   <section class="main">
     <div class="header">
-      <div class="auth">
+      <div v-if="!userAuthed && userAuthChecked" class="auth not-logged">
         <button @click.stop="authPopupToggle('login')"
           class="log-in">Log in</button>
-        <button class="sign-in">Sign in</button>
-        <login @hide="authPopup('login', false)" v-show="loginPopupShow"/>
+        <button @click.stop="authPopupToggle('register')"
+          class="sign-in">Sign in</button>
+        <login @hide="authPopup(false, 'login')" v-show="loginWindowPopup"/>
+        <register @hide="authPopup(false, 'register')" v-show="registerWindowPopup"/>
+      </div>
+      <div v-if="userAuthed && userAuthChecked" class="auth logged">
+        <div class="user-quick-info">
+          <p class="user-name">{{ userName }}</p>
+          <p class="user-email">{{ userEmail }}</p>
+          <p class="user-record"><!--
+          --><span class="record-label">Top speed achieved: </span><!--
+          --><span class="record-value">{{ getUserTypeRecord }}</span><!--
+      --></p>
+        </div>
+        <button @click.stop="logoutUser"
+          class="logout">Logout</button>
       </div>
     </div>
     <div class="text">
@@ -74,8 +88,10 @@
 <script>
 import ActionMenu from '~/components/ActionMenu.vue'
 import Login from '~/components/Login.vue'
+import Register from '~/components/Register.vue'
 import db from '~/plugins/firebase.js'
-import { mapState, mapMutations } from 'vuex'
+import { createNamespacedHelpers } from 'vuex'
+const { mapState, mapMutations, mapActions, mapGetters } = createNamespacedHelpers('auth')
 
 export default {
   data() {
@@ -98,7 +114,8 @@ export default {
       countdownInterval: null,
       descShow: false,
       fieldShow: false,
-      loginPopupShow: false,
+      loginWindowPopup: false,
+      registerWindowPopup: false,
 
       iLastTime: 0, // Type speed variables
       iTime: 0,
@@ -113,14 +130,24 @@ export default {
     }
   },
   created() {
-    this.$store.dispatch('refreshQuotes')
+    this.$store.dispatch('refreshQuotes', null, { root: true })
     .then(() => {
       console.log(this.$store.state.quoteList)
       this.pickRandomQuote()
     })
+    .catch(() => {
+      console.log('refresh error')
+    })
   },
   mounted() {
     this.popupItem = this.$el
+    this.checkUserAuth()
+      .then(response => {
+          console.log(response)
+      },
+      error => {
+          console.log(error)
+      })
   },
   methods: {
     pickRandomQuote() {
@@ -252,6 +279,7 @@ export default {
       console.log('Typing done!')
       this.speedResultCPM = this.speedCPM;
       this.speedResultWPM = this.speedWPM;
+      this.writeSpeedRecord({ value: this.speedResultCPM })
       this.typeFinished = true;
       this.destroyCounter()
       this.textTyped.push(this.textTyping)
@@ -298,20 +326,29 @@ export default {
       this.loadText()
       this.destroyCounter()
     },
-    authPopup(type, flag) {
+    authPopup(flag, type) {
       if (type == 'login') {
-        this.loginPopupShow = flag
-      } else if (type == 'signin') {
-
+        this.loginWindowPopup = flag
+        if (this.loginWindowPopup) this.registerWindowPopup = false
+      } else if (type == 'register') {
+        this.registerWindowPopup = flag
+        if (this.registerWindowPopup) this.loginWindowPopup = false
       }
     },
     authPopupToggle(type) {
       if (type == 'login') {
-        this.loginPopupShow ?
-          this.loginPopupShow = false :
-          this.loginPopupShow = true
+        this.loginWindowPopup = !this.loginWindowPopup
+        if (this.loginWindowPopup) this.registerWindowPopup = false
+      } else if (type == 'register') {
+        this.registerWindowPopup = !this.registerWindowPopup
+        if (this.registerWindowPopup) this.loginWindowPopup = false
       }
-    }
+    },
+    ...mapActions([
+      'logoutUser',
+      'checkUserAuth',
+      'writeSpeedRecord'
+    ])
   },
   computed: {
     typePlaceholder() {
@@ -327,12 +364,23 @@ export default {
       return 'rgba(' + red + ', ' + green + ', ' + blue +')'
     },
     ...mapState([
-      'quoteList'
+      'quoteList',
+      'userAuthed',
+      'userAuthChecked',
+      'userId',
+      'userEmail',
+      'userName',
+      'userTypeRecordCPM',
+      'userTypeRecordWPM'
+    ]),
+    ...mapGetters([
+      'getUserTypeRecord'
     ])
   },
   components: {
     ActionMenu,
-    Login
+    Login,
+    Register
   }
 }
 </script>
@@ -373,11 +421,25 @@ export default {
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-start;
+  align-items: flex-start;
   position: relative;
 
   button:not(:first-child) {
     margin-left: 10px;
   }
+}
+
+.auth.logged {
+  p {
+    line-height: 20px;
+  }
+  .logout {
+    margin-left: auto;
+  }
+}
+
+.user-name {
+  font-size: 16px;
 }
 
 .speed {

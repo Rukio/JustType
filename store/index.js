@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import firebase from '~/plugins/firebase.js'
 import admin from '~/store/admin.js'
+import auth from '~/store/auth.js'
 
 Vue.use(Vuex)
 
@@ -48,7 +49,8 @@ const store = () => new Vuex.Store({
     }
   },
   modules: {
-    admin
+    admin,
+    auth
   }
 })
 
