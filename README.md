@@ -1,6 +1,6 @@
 # justtype
 
-> Nuxt.js project
+This is my Vuejs, Nuxt, Firebase project for measuring a typing speed on a keybord.
 
 ## Build Setup
 
