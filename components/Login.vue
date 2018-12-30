@@ -4,6 +4,7 @@
         <form @submit.prevent="login" class="login-form">
             <div class="email">
                 <input v-model="email"
+                    :class="{ 'error-field' : errors.email }"
                     type="text" placeholder="E-mail">
             </div>
             <div class="password">
@@ -30,12 +31,17 @@ export default {
     data() {
         return {
             email: '',
-            password: ''
+            password: '',
+            errors: {
+                email: false,
+                password: false
+            }
         }
     },
 
     methods: {
         login() {
+            if (this.validateForm())
             this.loginUser({
                 email: this.email,
                 password: this.password
@@ -46,6 +52,31 @@ export default {
             error => {
                 console.log(error)
             })
+        },
+        validateForm() {
+            if (!this.email && !this.password) {
+                this.errors.email = true
+                this.errors.password = true
+                console.log('Fill up the fields')
+            } else if (!this.email) {
+                this.errors.email = true
+                console.log('Fill up the email field')
+            } else if (!this.password) {
+                this.errors.password = true
+            } else if (!/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+                .test(String(this.email).toLowerCase())) {
+                    this.errors.email = true
+                    console.log('Invalid email format')
+                }
+            else if (this.password.length < 6) {
+                this.errors.password = true
+                console.log('Password must be at least 6 characters long')
+            } else {
+                this.errors.email = false
+                this.errors.password = false
+                return true
+            }
+            return false
         },
         hide() {
             this.$emit('hide')

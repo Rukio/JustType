@@ -646,14 +646,6 @@ export default {
   }
 }
 
-.error {
-  color: red;
-
-  &-field {
-    background: linear-gradient(to bottom, #da9797 0%,#c34848 100%) !important;
-  }
-}
-
 .type-field {
   margin-top: 39px;
   height: 40px;

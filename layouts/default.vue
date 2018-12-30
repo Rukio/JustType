@@ -61,6 +61,14 @@ textarea {
   resize: none;
 }
 
+.error {
+  color: red;
+
+  &-field {
+    background: linear-gradient(to bottom, #da9797 0%,#c34848 100%) !important;
+  }
+}
+
 button {
   border: 2px solid #4883c3;
   background-color: transparent;

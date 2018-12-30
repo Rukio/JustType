@@ -6,9 +6,10 @@ export default {
         userAuthed: false,
         userAuthChecked: false,
         userId: '',
-        userEmail: 'not defined still',
+        userEmail: 'Not defined still',
         userName: '',
         userTypeRecordCPM: '',
+        noRecordMsg: 'No activity yet',
         speedFormat: 'WPM',
     },
     mutations: {
@@ -66,7 +67,7 @@ export default {
                     })
             })
         },
-        registerUser({ commit, dispatch }, { email, password, nameDisplayed }) {
+        registerUser({ commit, dispatch, state }, { email, password, nameDisplayed }) {
             return new Promise((resolve, reject) => {
                 firebase.auth().createUserWithEmailAndPassword(email, password)
                 .then(() => {
@@ -78,8 +79,10 @@ export default {
                     dispatch('addUserProperties', {
                         email: email,
                         nameShowed: nameDisplayed,
-                        typeRecordCPM: 'No activity found'
-                    })
+                        typeRecordCPM: '0'
+                    }).then((result) => {
+                        console.log(result)
+                    }).catch((error) => { console.log(error)})
                 })
                 .catch((error) => {
                     reject(error)
@@ -95,6 +98,7 @@ export default {
                 .then(() => {
                     commit('setUserName', nameShowed)
                     commit('setUserTypeRecordCPM', typeRecordCPM)
+                    console.log(email + ' ' + nameShowed + ' ' + typeRecordCPM)
                     resolve('User props added')
                 })
                 .catch((error) => {
@@ -174,10 +178,14 @@ export default {
     },
     getters: {
         getUserTypeRecord: state => {
-            if (state.speedFormat == 'CPM') {
-                return state.userTypeRecordCPM
-            } else if (state.speedFormat == 'WPM') {
-                return state.userTypeRecordCPM / 5
+            if (state.userTypeRecordCPM != 0) {
+                if (state.speedFormat == 'CPM') {
+                    return state.userTypeRecordCPM
+                } else if (state.speedFormat == 'WPM') {
+                    return state.userTypeRecordCPM / 5
+                }
+            } else {
+                return state.noRecordMsg
             }
         }
     }
